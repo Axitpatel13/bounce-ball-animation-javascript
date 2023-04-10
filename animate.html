@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script>
+        //get element
+        const canvas = document.getElementById("canvas");
+
+        //set up context
+        const ctx = canvas.getContext("2d");
+
+        //set the ball's initial position and velocity
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+        let dx = 2;
+        let dy = -2;
+
+        //ball radius and mass
+        const ballRadius = 10;
+        const ballMass = 1;
+        
+        //set gravitational accelaration,friction
+        const gravity = 0.1;
+        const friction = 0.8;
+
+        //draw ball on canva
+        function drawBall(){
+            ctx.beginPath();
+            ctx.arc(x,y,ballRadius,0,Math.PI*2)
+            ctx.fillStyle = "red";
+            ctx.fill();
+            ctx.closePath();
+        }
+        //clear canva and redraw
+        function draw(){
+            dy += gravity;
+
+            //apply friction to velcity if on ground
+            if(y + dy > canvas.height - ballRadius){
+                dy = -dy * friction;
+                dx *= friction;
+            }
+
+            //move the ball
+            x += dx;
+            y += dy;
+
+            //bounce the ball off the walls
+            if(x + dx > canvas.width - ballRadius || x + dx < ballRadius){
+                dx = -dx;
+            }
+            if(y + dy > canvas.height - ballRadius){
+                y = canvas.height - ballRadius;
+            }
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            drawBall();
+        }
+        //add a click event listner
+        canvas.addEventListener("click", function(event){
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX -rect.left;
+            const mouseY = event.clientY -rect.top;
+
+            if(mouseX > x - ballRadius &&
+            mouseX < x + ballRadius &&
+            mouseY > y - ballRadius &&
+            mouseY < y + ballRadius 
+            ){
+                dx = -dx;
+                dy = -dy;
+            }
+        });
+        setInterval(draw,10);
+    </script>
+</body>
+</html>
